@@ -1,6 +1,7 @@
 #include "myESP8266.h"
 #include <Stream.h>
 
+
 myESP8266::myESP8266(Stream &ESP8266Serial, Stream &Debug)
 {
   _thisSerial=&ESP8266Serial;
@@ -18,7 +19,10 @@ void myESP8266::setPacketBuffer(byte* packetBuffer)
 {
   _packetBuffer = packetBuffer;
 }
-
+byte* myESP8266::getPacketBuffer()
+{
+  return _packetBuffer;
+}
 void myESP8266::flushESP8266()
 {
   while(_thisSerial->available())

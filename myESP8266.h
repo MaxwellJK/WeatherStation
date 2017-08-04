@@ -5,14 +5,14 @@
 #include <Stream.h>
 #include <Arduino.h>
 
+
 class myESP8266
 {
   public:
     myESP8266(Stream &ESP8266Serial, Stream &Debug);
-    int NTP_PACKET_SIZE;
-    byte* _packetBuffer;
     void setNTP_PACKET_SIZE(int NTP_PACKET_SIZE);
     void setPacketBuffer(byte* packetBuffer);
+    byte* getPacketBuffer();
     void flushESP8266();
     bool testESP8266();
     bool resetESP8266();
@@ -32,6 +32,8 @@ class myESP8266
     bool serialRider(char *string);
     bool evaluateSerialRiderLite(char* strStatuses[], int numOfStatuses);
     char* serialRiderLite();
+    int NTP_PACKET_SIZE;
+    byte* _packetBuffer;
     
     Stream *_thisSerialDebug;
     bool serialRider1(char *string);
