@@ -10,7 +10,7 @@ class myESP8266
   public:
     myESP8266(Stream &ESP8266Serial, Stream &Debug);
     int NTP_PACKET_SIZE;
-    byte* packetBuffer;
+    byte* _packetBuffer;
     void setNTP_PACKET_SIZE(int NTP_PACKET_SIZE);
     void setPacketBuffer(byte* packetBuffer);
     void flushESP8266();
@@ -32,7 +32,6 @@ class myESP8266
     bool serialRider(char *string);
     bool evaluateSerialRiderLite(char* strStatuses[], int numOfStatuses);
     char* serialRiderLite();
-    //byte _packetBuffer[48];
     
     Stream *_thisSerialDebug;
     bool serialRider1(char *string);
