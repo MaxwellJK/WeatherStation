@@ -1,28 +1,25 @@
 #include "myESP8266.h"
 #include <Stream.h>
 
-
 myESP8266::myESP8266(Stream &ESP8266Serial, Stream &Debug)
 {
   _thisSerial=&ESP8266Serial;
-  _thisSerialDebug=&Debug;  
-  //_thisSerial->println("ciao2");
-  //const int NTP_PACKET_SIZE= 48;
-  //byte* _packetBuffer[];
+  _thisSerialDebug=&Debug;
 }
 
 void myESP8266::setNTP_PACKET_SIZE(int NTP_PACKET_SIZE)
 {
   this->NTP_PACKET_SIZE = NTP_PACKET_SIZE;
 }
-void myESP8266::setPacketBuffer(byte* packetBuffer)
+void myESP8266::setPacketBuffer(byte *packetBuffer)
 {
   _packetBuffer = packetBuffer;
 }
 byte* myESP8266::getPacketBuffer()
 {
-  return _packetBuffer;
+  //return _packetBuffer;
 }
+
 void myESP8266::flushESP8266()
 {
   while(_thisSerial->available())
@@ -262,43 +259,47 @@ bool myESP8266::sendData(char *message)
   }
 }
 
-bool myESP8266::sendDataWithChannel(char *chan, byte message[])
+bool myESP8266::sendDataWithChannel(char *chan, byte* message)
 {
   String cmd;
   cmd += "AT+CIPSEND=";
   cmd += chan;
   cmd += ",";
   cmd += "48";
-  _thisSerialDebug->println(cmd);
   _thisSerial->println(cmd);
   if(serialRider1(">"))
   {
-    _thisSerialDebug->println("> found");
-    _thisSerialDebug->write(_packetBuffer,48);
-    _thisSerial->write(_packetBuffer,48);
-    if(serialRider1("SEND OK"))
+    for(int i=0;i<=48;i++)
     {
-      delay(1000);
-      if (serialRider1("+IPD,1,48:"))
-      {
-        
+      _thisSerial->write(message[i]);
+    }
+    if(serialRider1("+IPD,1,48:"))
+    {
+        delay(200);
+        int pos = 0;
+        while(_thisSerial->available())
+        {
+          message[pos] = _thisSerial->read();
+          pos++;
+        }
         return true;
-      }
-      //while(_thisSerial->available())
-      //{
-        //_thisSerialDebug->print(_thisSerial->read());
-      //}
-      return false;
-    }
-    else
-    {
-      return false;
     }
   }
-  else
-  {
-    return false;
-  }
+  return false;
+//      else
+//      {
+//         return false;
+//      }
+//    }
+//    else
+//    {
+//      return false;
+//    }
+//  }
+//  else
+//  {
+//    return false;
+//  }
 }
 //boolean sendData(String data)
 //{
@@ -449,6 +450,11 @@ bool myESP8266::serialRider(char *string) //suggested by Marta, formerly serialR
       //#endif
       newData = false;
     }
+    if (_thisSerial->available() == 0 && newData == false && strcmp(receivedChars, string)==0)
+    {
+      foundIt = true;
+      CAA = false; 
+    }
   }
   return foundIt;
 }
@@ -468,7 +474,7 @@ bool myESP8266::serialRider1(char *string) //suggested by Marta, formerly serial
   char rc;
   bool CAA = true; //Comando Arlecchino Avviato
   bool newData = false;
-  int numChars = 48;
+  int numChars = 100;
   char receivedChars[numChars];   // an array to store the received data
   char storedChars[numChars];   // an array to store the received data
 
@@ -479,9 +485,9 @@ bool myESP8266::serialRider1(char *string) //suggested by Marta, formerly serial
   {
     while (_thisSerial->available() > 0 && newData == false) 
     {
-      //_thisSerialDebug->println("in newdata");
       rc = _thisSerial->read();
-      _thisSerialDebug->print(rc);
+      _thisSerialDebug->print("in newdata: ");
+      _thisSerialDebug->println(rc);
       
       if (rc != carriageReturn && rc != newLine)
       {
@@ -502,7 +508,6 @@ bool myESP8266::serialRider1(char *string) //suggested by Marta, formerly serial
       }
       if (newData == true)
       {
-        //_thisSerialDebug->println(storedChars);
         if (strcmp(storedChars, string)==0 || strcmp(storedChars, "no change")==0)
         {
           foundIt = true;
@@ -512,6 +517,21 @@ bool myESP8266::serialRider1(char *string) //suggested by Marta, formerly serial
         {
           CAA=false;
         }
+//        _thisSerialDebug->print("strstr: ");
+//        _thisSerialDebug->println(strstr(storedChars, "+IPD,1,48:"));
+//        char *p = strstr(storedChars, "+IPD,1,48:");
+//        if (p)
+//        {
+//          for (int i=0; i<48; i++)
+//          {
+//            //_packetBuffer[i]
+//            _thisSerialDebug->print(i);
+//            _thisSerialDebug->print(" - ");
+//            _thisSerialDebug->print(storedChars[i]);
+//          }
+//          _thisSerialDebug->println();
+//          CAA=false;
+//        }
       }
       //#if defined(_DEBUG_)==1
       //showNewData();
@@ -527,8 +547,8 @@ bool myESP8266::serialRider1(char *string) //suggested by Marta, formerly serial
 //    _thisSerialDebug->println();
     if (_thisSerial->available() == 0 && newData == false && strcmp(receivedChars, string)==0)
     {
-//      _thisSerialDebug->println(strcmp(receivedChars, string));
-//      _thisSerialDebug->println(receivedChars);
+      //_thisSerialDebug->println(strcmp(receivedChars, string));
+      //_thisSerialDebug->println(receivedChars);
       foundIt = true;
       CAA = false; 
     }

@@ -5,13 +5,12 @@
 #include <Stream.h>
 #include <Arduino.h>
 
-
 class myESP8266
 {
   public:
     myESP8266(Stream &ESP8266Serial, Stream &Debug);
     void setNTP_PACKET_SIZE(int NTP_PACKET_SIZE);
-    void setPacketBuffer(byte* packetBuffer);
+    void setPacketBuffer(byte *packetBuffer);
     byte* getPacketBuffer();
     void flushESP8266();
     bool testESP8266();
@@ -25,7 +24,7 @@ class myESP8266
     bool setMultiConnection(String Chan, String connType, String ipDest, String port);
     bool closeMultiConnection(String Chan);
     bool sendData(char *message);
-    bool sendDataWithChannel(char *Chan, byte message[]);
+    bool sendDataWithChannel(char *Chan, byte* message);
     
   private:
     Stream *_thisSerial;
@@ -33,7 +32,7 @@ class myESP8266
     bool evaluateSerialRiderLite(char* strStatuses[], int numOfStatuses);
     char* serialRiderLite();
     int NTP_PACKET_SIZE;
-    byte* _packetBuffer;
+    byte *_packetBuffer;
     
     Stream *_thisSerialDebug;
     bool serialRider1(char *string);
